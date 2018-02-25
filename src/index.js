@@ -2,7 +2,7 @@ require("../static/style.css");
 
 const G = 0.0000001;
 
-function draw(stars) {
+function draw(stars, region) {
     const canvas = document.getElementById('target');
     const ctx = canvas.getContext("2d");
     const cx = canvas.clientWidth / 2;
@@ -10,8 +10,11 @@ function draw(stars) {
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-    
-    ctx.setTransform(100, 0, 0, 100, cx, cy);
+
+    const s = Math.min(
+        canvas.clientWidth / region.w,
+        canvas.clientHeight / region.h);
+    ctx.setTransform(s, 0, 0, s, cx, cy);
     for (var i = 0; i < stars.length; i++) {
         ctx.fillRect(
             stars[i].p.x,
@@ -99,11 +102,28 @@ function drawEnergy(stars) {
     }
     ctx.stroke();
 
-    if (frame % 5 == 0) {
+    if (frame % 50 == 0) {
         const E = energy(stars);
         energyHistory.push(E);
         energyHistory.splice(0, energyHistory.length - historySize);
     }
+}
+
+function findRegion(stars) {
+    const max = {
+        x: Math.max.apply(null, stars.map(function(star) { return star.p.x; })),
+        y: Math.max.apply(null, stars.map(function(star) { return star.p.y; }))
+    };
+    const min = {
+        x: Math.min.apply(null, stars.map(function(star) { return star.p.x; })),
+        y: Math.min.apply(null, stars.map(function(star) { return star.p.y; }))
+    };
+    return {
+        x: min.x,
+        y: min.y,
+        w: max.x - min.x,
+        h: max.y - min.y
+    };
 }
 
 function simulate(n) {
@@ -122,7 +142,7 @@ function simulate(n) {
         if (lastTime) {
             const dt = lastTime - time;
             step(stars, dt);
-            draw(stars);
+            draw(stars, findRegion(stars));
             drawEnergy(stars);
         }
         
