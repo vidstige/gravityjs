@@ -35,6 +35,8 @@ function gravity(a, b) {
     };
 }
 
+const G = 0.00000001;
+
 function step(stars, dt) {
     var f = []; // force vectors
 
@@ -53,9 +55,35 @@ function step(stars, dt) {
         const star = stars[i];
         star.p.x += star.v.x * dt;
         star.p.y += star.v.y * dt;
-        star.v.x += 0.00000001 * f[i].x;
-        star.v.y += 0.00000001 * f[i].y;
+        star.v.x += G * f[i].x;
+        star.v.y += G * f[i].y;
     }
+}
+
+function energy(stars) {
+    var E = 0;
+    for (var i = 0; i < stars.length; i++) {
+        // kinetic energy
+        const m = stars[i].m;
+        const v2 = norm2(stars[i].v);
+        E += 0.5 * m * v2;
+    
+        // potential energy
+        for (var j = i+1; j < stars.length; j++) {
+            const r = Math.sqrt(norm2(diff(stars[i].p, stars[j].p)));
+            E += -G * stars[i].m * stars[j].m / r;
+        }
+    }
+    return E;
+}
+
+function drawEnergy(stars) {
+    const canvas = document.getElementById('target');
+    const ctx = canvas.getContext("2d");
+   
+    const E = energy(stars);
+    ctx.font = "30px Arial";
+    ctx.fillText("E: " + E, 2, 30);
 }
 
 function simulate(n) {
@@ -66,6 +94,7 @@ function simulate(n) {
             x: stars[i].p.y / 1000,
             y: -stars[i].p.x / 1000
         }
+        stars[i].m = 1;
     }
 
     var lastTime = null;
@@ -74,6 +103,7 @@ function simulate(n) {
             const dt = lastTime - time;
             step(stars, dt);
             draw(stars);
+            drawEnergy(stars);
         }
         
         lastTime = time;
