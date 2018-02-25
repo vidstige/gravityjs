@@ -1,6 +1,6 @@
 require("../static/style.css");
 
-const G = 0.0000001;
+const G = 0.005;
 
 function draw(stars, region) {
     const canvas = document.getElementById('target');
@@ -35,11 +35,11 @@ function norm2(v) {
 }
 
 function gravity(a, b) {
-    const d = diff(a.p, b.p);
+    const d = diff(b.p, a.p);
     const r2 = norm2(d);
     return {
-        x: d.x / r2,
-        y: d.y / r2
+        x: G * d.x * a.m * b.m / r2,
+        y: G * d.y * a.m * b.m / r2
     };
 }
 
@@ -61,8 +61,8 @@ function step(stars, dt) {
         const star = stars[i];
         star.p.x += star.v.x * dt;
         star.p.y += star.v.y * dt;
-        star.v.x += G * f[i].x;
-        star.v.y += G * f[i].y;
+        star.v.x += f[i].x * dt / star.m;
+        star.v.y += f[i].y * dt / star.m;
     }
 }
 
@@ -131,8 +131,8 @@ function simulate(n) {
     for (var i = 0; i < n; i++) {
         stars[i] = {p: randomPoint()};
         stars[i].v = {
-            x: 20000 * G *  stars[i].p.y,
-            y: 20000 * G * -stars[i].p.x
+            x: 500 * G * stars[i].p.y,
+            y: 500 * G * -stars[i].p.x
         }
         stars[i].m = 1;
     }
@@ -141,8 +141,9 @@ function simulate(n) {
     function animate(time) {
         if (lastTime) {
             const dt = lastTime - time;
-            step(stars, dt);
+            step(stars, dt / 1000);
             draw(stars, findRegion(stars));
+            //draw(stars, {x: -10, y: -10, w: 20, h: 20});
             drawEnergy(stars);
         }
         
