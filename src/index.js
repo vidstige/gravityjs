@@ -1,5 +1,7 @@
 require("../static/style.css");
 
+const G = 0.0000001;
+
 function draw(stars) {
     const canvas = document.getElementById('target');
     const ctx = canvas.getContext("2d");
@@ -9,8 +11,8 @@ function draw(stars) {
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
     for (var i = 0; i < stars.length; i++) {
         ctx.fillRect(
-            cx + stars[i].p.x * 400,
-            cy + stars[i].p.y * 400,
+            cx + stars[i].p.x * 80,
+            cy + stars[i].p.y * 80,
             2, 2);
     }
 }
@@ -34,8 +36,6 @@ function gravity(a, b) {
         y: d.y / r2
     };
 }
-
-const G = 0.00000001;
 
 function step(stars, dt) {
     var f = []; // force vectors
