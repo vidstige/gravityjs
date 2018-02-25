@@ -51,17 +51,21 @@ function step(stars, dt) {
 
     for (var i = 0; i < stars.length; i++) {
         const star = stars[i];
-        star.p.x += 0.0001 * star.v.x * dt;
-        star.p.y += 0.0001 * star.v.y * dt;
-        star.v.x += 0.0001 * f[i].x;
-        star.v.y += 0.0001 * f[i].y;
+        star.p.x += star.v.x * dt;
+        star.p.y += star.v.y * dt;
+        star.v.x += 0.00000001 * f[i].x;
+        star.v.y += 0.00000001 * f[i].y;
     }
 }
 
 function simulate(n) {
     var stars = [];
     for (var i = 0; i < n; i++) {
-        stars[i] = {p: randomPoint(), v: randomPoint()};
+        stars[i] = {p: randomPoint()};
+        stars[i].v = {
+            x: stars[i].p.y / 1000,
+            y: -stars[i].p.x / 1000
+        }
     }
 
     var lastTime = null;
@@ -75,13 +79,12 @@ function simulate(n) {
         lastTime = time;
         requestAnimationFrame(animate);
     }
-    
 
     requestAnimationFrame(animate);
 }
 
 function load() {
-    simulate(100);
+    simulate(400);
 }
 
 document.addEventListener("DOMContentLoaded", load);
