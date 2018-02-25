@@ -85,9 +85,9 @@ function drawEnergy(stars) {
     var min = Math.min.apply(null, energyHistory);
     var max = Math.max.apply(null, energyHistory);
 
-    const canvas = document.getElementById('target');
+    const canvas = document.getElementById('overlay');
     const ctx = canvas.getContext("2d");
-
+    ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
     ctx.beginPath();
     ctx.moveTo(0, 40);
     for (var i = 0; i < energyHistory.length; i++) {
@@ -96,7 +96,7 @@ function drawEnergy(stars) {
     }
     ctx.stroke();
 
-    if (frame % 10 == 0) {
+    if (frame % 5 == 0) {
         const E = energy(stars);
         energyHistory.push(E);
         energyHistory.splice(0, energyHistory.length - historySize);
