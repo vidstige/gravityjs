@@ -8,12 +8,15 @@ function draw(stars) {
     const cx = canvas.clientWidth / 2;
     const cy = canvas.clientHeight / 2;
 
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+    
+    ctx.setTransform(100, 0, 0, 100, cx, cy);
     for (var i = 0; i < stars.length; i++) {
         ctx.fillRect(
-            cx + stars[i].p.x * 80,
-            cy + stars[i].p.y * 80,
-            2, 2);
+            stars[i].p.x,
+            stars[i].p.y,
+            0.02, 0.02);
     }
 }
 
@@ -108,8 +111,8 @@ function simulate(n) {
     for (var i = 0; i < n; i++) {
         stars[i] = {p: randomPoint()};
         stars[i].v = {
-            x: stars[i].p.y / 1000,
-            y: -stars[i].p.x / 1000
+            x: 20000 * G *  stars[i].p.y,
+            y: 20000 * G * -stars[i].p.x
         }
         stars[i].m = 1;
     }
