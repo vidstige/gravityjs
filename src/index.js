@@ -77,13 +77,30 @@ function energy(stars) {
     return E;
 }
 
+const energyHistory = [];
+const historySize = 200;
+var frame = 0;
 function drawEnergy(stars) {
+    frame++;
+    var min = Math.min.apply(null, energyHistory);
+    var max = Math.max.apply(null, energyHistory);
+
     const canvas = document.getElementById('target');
     const ctx = canvas.getContext("2d");
-   
-    const E = energy(stars);
-    ctx.font = "30px Arial";
-    ctx.fillText("E: " + E, 2, 30);
+
+    ctx.beginPath();
+    ctx.moveTo(0, 40);
+    for (var i = 0; i < energyHistory.length; i++) {
+        const y = 40 - 40 * (energyHistory[i] - min) / (max - min);
+        ctx.lineTo(i * 4, y);
+    }
+    ctx.stroke();
+
+    if (frame % 10 == 0) {
+        const E = energy(stars);
+        energyHistory.push(E);
+        energyHistory.splice(0, energyHistory.length - historySize);
+    }
 }
 
 function simulate(n) {
