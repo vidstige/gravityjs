@@ -126,24 +126,41 @@ function findRegion(stars) {
     };
 }
 
+function body(p, m) {
+    return {
+        p: p,
+        v: {
+            x: 280 *  G * p.y,
+            y: 280 * -G * p.x
+        },
+        m: m
+    };
+}
+
+function galaxy(stars, n) {
+    stars.push(body({x: 0, y: 0}, 1000));
+    for (var i = 1; i < n; i++) {
+        //const p = randomPoint();
+        const theta = Math.random() * Math.PI * 2;
+        const r = Math.random();
+        const p = {
+            x: Math.cos(theta) + Math.cos(theta) * r,
+            y: Math.sin(theta) + Math.sin(theta) * r};
+        stars.push(body(p, 0.5));
+    }
+}
+
 function simulate(n) {
     var stars = [];
-    for (var i = 0; i < n; i++) {
-        stars[i] = {p: randomPoint()};
-        stars[i].v = {
-            x: 500 * G * stars[i].p.y,
-            y: 500 * G * -stars[i].p.x
-        }
-        stars[i].m = 1;
-    }
+    galaxy(stars, n);
 
     var lastTime = null;
     function animate(time) {
         if (lastTime) {
             const dt = lastTime - time;
             step(stars, dt / 1000);
-            draw(stars, findRegion(stars));
-            //draw(stars, {x: -10, y: -10, w: 20, h: 20});
+            //draw(stars, findRegion(stars));
+            draw(stars, {x: -4, y: -4, w: 8, h: 8});
             drawEnergy(stars);
         }
         
@@ -155,7 +172,7 @@ function simulate(n) {
 }
 
 function load() {
-    simulate(400);
+    simulate(800);
 }
 
 document.addEventListener("DOMContentLoaded", load);
