@@ -5,21 +5,34 @@ const G = 0.005;
 function draw(stars, region) {
     const canvas = document.getElementById('target');
     const ctx = canvas.getContext("2d");
+    
     const cx = canvas.clientWidth / 2;
     const cy = canvas.clientHeight / 2;
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 
+    const r = 0.1;
+    const d = r * 2;
+    const gradient = ctx.createRadialGradient(r, r, r, r, r, 0);
+    gradient.addColorStop(0, 'transparent');
+    gradient.addColorStop(1, 'white');
+    ctx.fillStyle = gradient;
+
     const s = Math.min(
         canvas.clientWidth / region.w,
         canvas.clientHeight / region.h);
     ctx.setTransform(s, 0, 0, s, cx, cy);
     for (var i = 0; i < stars.length; i++) {
-        ctx.fillRect(
+        ctx.save();
+        ctx.translate(
             stars[i].p.x,
             stars[i].p.y,
-            0.02, 0.02);
+        );
+        ctx.fillRect(
+            0, 0,
+            d, d);
+        ctx.restore();
     }
 }
 
@@ -179,7 +192,7 @@ function simulate(n) {
             const dt = lastTime - time;
             step(stars, dt / 1000);
             //draw(stars, findRegion(stars));
-            const s = 10;
+            const s = 6;
             draw(stars, {x: -s, y: -s, w: s*2, h: s*2});
             drawEnergy(stars);
         }
