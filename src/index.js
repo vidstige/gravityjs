@@ -126,19 +126,34 @@ function findRegion(stars) {
     };
 }
 
-function body(p, m) {
+function body(p, m, factor) {
     return {
         p: p,
         v: {
-            x: 280 *  G * p.y,
-            y: 280 * -G * p.x
+            x: factor *  G * p.y,
+            y: factor * -G * p.x
         },
         m: m
     };
 }
 
-function galaxy(stars, n) {
-    stars.push(body({x: 0, y: 0}, 1000));
+function offset(v, o) {
+    v.x += o.x;
+    v.y += o.y;
+}
+function cross(v) {
+    return {x: v.y, y: -v.x};
+}
+function mul(v, scalar) {
+    return {x: v.x * scalar, y: v.y * scalar};
+}
+
+function galaxy(stars, n, center) {
+    const radialVelocity = 1.1 * n;
+    const blackHole = body({x: 0, y: 0}, n*2.5, radialVelocity);
+    offset(blackHole.p, center);
+    offset(blackHole.v, mul(cross(center), 0.2));
+    stars.push(blackHole);
     for (var i = 1; i < n; i++) {
         //const p = randomPoint();
         const theta = Math.random() * Math.PI * 2;
@@ -146,13 +161,17 @@ function galaxy(stars, n) {
         const p = {
             x: Math.cos(theta) + Math.cos(theta) * r,
             y: Math.sin(theta) + Math.sin(theta) * r};
-        stars.push(body(p, 0.5));
+        const star = body(p, 0.5, radialVelocity);
+        offset(star.p, center);
+        offset(star.v, mul(cross(center), 0.2));
+        stars.push(star);
     }
 }
 
 function simulate(n) {
     var stars = [];
-    galaxy(stars, n);
+    galaxy(stars, n/2, {x: -5, y: 0});
+    galaxy(stars, n/2, {x: 5, y: 0});
 
     var lastTime = null;
     function animate(time) {
@@ -160,7 +179,8 @@ function simulate(n) {
             const dt = lastTime - time;
             step(stars, dt / 1000);
             //draw(stars, findRegion(stars));
-            draw(stars, {x: -4, y: -4, w: 8, h: 8});
+            const s = 10;
+            draw(stars, {x: -s, y: -s, w: s*2, h: s*2});
             drawEnergy(stars);
         }
         
@@ -172,7 +192,7 @@ function simulate(n) {
 }
 
 function load() {
-    simulate(800);
+    simulate(400);
 }
 
 document.addEventListener("DOMContentLoaded", load);
