@@ -12,7 +12,7 @@ function draw(stars, region) {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 
-    const r = 0.1;
+    const r = 0.2;
     const d = r * 2;
     const gradient = ctx.createRadialGradient(r, r, r, r, r, 0);
     gradient.addColorStop(0, 'transparent');
@@ -134,18 +134,19 @@ function findRegion(stars) {
     return {
         x: min.x,
         y: min.y,
-        w: max.x - min.x,
-        h: max.y - min.y
+        w: (max.x - min.x) * 2,
+        h: (max.y - min.y) * 2
     };
 }
 
 function body(p, m, factor) {
+    var length = Math.sqrt(norm2(p));
+    if (length < 0.0000001) {
+        length = 1;
+    }
     return {
         p: p,
-        v: {
-            x: factor *  G * p.y,
-            y: factor * -G * p.x
-        },
+        v: mul(cross(p), factor *  G / length),
         m: m
     };
 }
@@ -162,38 +163,40 @@ function mul(v, scalar) {
 }
 
 function galaxy(stars, n, center) {
-    const radialVelocity = 1.1 * n;
+    const speed = 0.01;
+    const radialVelocity = 1.2 * n;
     const blackHole = body({x: 0, y: 0}, n*2.5, radialVelocity);
     offset(blackHole.p, center);
-    offset(blackHole.v, mul(cross(center), 0.2));
+    offset(blackHole.v, mul(cross(center), speed));
     stars.push(blackHole);
     for (var i = 1; i < n; i++) {
         //const p = randomPoint();
         const theta = Math.random() * Math.PI * 2;
-        const r = Math.random();
+        const r = Math.random() * 5;
         const p = {
             x: Math.cos(theta) + Math.cos(theta) * r,
             y: Math.sin(theta) + Math.sin(theta) * r};
         const star = body(p, 0.5, radialVelocity);
         offset(star.p, center);
-        offset(star.v, mul(cross(center), 0.2));
+        offset(star.v, mul(cross(center), speed));
         stars.push(star);
     }
 }
 
 function simulate(n) {
     var stars = [];
-    galaxy(stars, n/2, {x: -5, y: 0});
-    galaxy(stars, n/2, {x: 5, y: 0});
+    galaxy(stars, n/2, {x: -15, y: 0});
+    galaxy(stars, n/2, {x: 15, y: 0});
+    //galaxy(stars, n, {x: 0, y: 0});
 
     var lastTime = null;
     function animate(time) {
         if (lastTime) {
             const dt = lastTime - time;
             step(stars, dt / 1000);
-            //draw(stars, findRegion(stars));
-            const s = 6;
-            draw(stars, {x: -s, y: -s, w: s*2, h: s*2});
+            draw(stars, findRegion(stars));
+            //const s = 10;
+            //draw(stars, {x: -s, y: -s, w: s*2, h: s*2});
             drawEnergy(stars);
         }
         
