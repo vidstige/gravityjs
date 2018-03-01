@@ -183,6 +183,23 @@ function galaxy(stars, n, center) {
     }
 }
 
+function avg(arr) {
+    var sum = 0;
+    for (var i = 0; i < arr.length; i++) {
+        sum += arr[i];
+    }
+    return sum / arr.length;
+}
+
+function average(regions) {
+    return {
+        x: avg(regions.map(function(r) { return r.x; })),
+        y: avg(regions.map(function(r) { return r.y; })),
+        w: avg(regions.map(function(r) { return r.w; })),
+        h: avg(regions.map(function(r) { return r.h; }))
+    };
+}
+
 function simulate(n) {
     var stars = [];
     galaxy(stars, n/2, {x: -15, y: 0});
@@ -190,11 +207,14 @@ function simulate(n) {
     //galaxy(stars, n, {x: 0, y: 0});
 
     var lastTime = null;
+    var regions = [];
     function animate(time) {
         if (lastTime) {
             const dt = lastTime - time;
             step(stars, dt / 1000);
-            draw(stars, findRegion(stars));
+            regions.push(findRegion(stars));
+            regions.splice(0, regions.length - 50);
+            draw(stars, average(regions));
             //const s = 10;
             //draw(stars, {x: -s, y: -s, w: s*2, h: s*2});
             drawEnergy(stars);
