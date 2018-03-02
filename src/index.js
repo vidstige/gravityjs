@@ -122,15 +122,26 @@ function drawEnergy(stars) {
     }
 }
 
+function numericalOrder(a, b) {
+    return a - b;
+}
+
 function findRegion(stars) {
+    const xs = stars.map(function(star) { return star.p.x; });
+    const ys = stars.map(function(star) { return star.p.y; });
+    xs.sort(numericalOrder);
+    ys.sort(numericalOrder);
+
+    const p = Math.floor(stars.length * 0.1);
     const max = {
-        x: Math.max.apply(null, stars.map(function(star) { return star.p.x; })),
-        y: Math.max.apply(null, stars.map(function(star) { return star.p.y; }))
+        x: xs[xs.length-1 - p],
+        y: ys[ys.length-1 - p]
     };
     const min = {
-        x: Math.min.apply(null, stars.map(function(star) { return star.p.x; })),
-        y: Math.min.apply(null, stars.map(function(star) { return star.p.y; }))
+        x: xs[p],
+        y: ys[p]
     };
+
     return {
         x: min.x,
         y: min.y,
