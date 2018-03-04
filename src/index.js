@@ -2,7 +2,7 @@ require("../static/style.css");
 
 const G = 0.005;
 
-function draw(stars, region) {
+function draw(stars, region, background) {
     const canvas = document.getElementById('target');
     const ctx = canvas.getContext("2d");
     
@@ -23,6 +23,11 @@ function draw(stars, region) {
         canvas.clientWidth / region.w,
         canvas.clientHeight / region.h);
     ctx.setTransform(s, 0, 0, s, cx, cy);
+    ctx.drawImage(background,
+        -50, -30,
+        background.width / 20,
+        background.height / 20
+    );
     for (var i = 0; i < stars.length; i++) {
         ctx.save();
         ctx.translate(
@@ -211,7 +216,7 @@ function average(regions) {
     };
 }
 
-function simulate(n) {
+function simulate(n, background) {
     var stars = [];
     galaxy(stars, n/2, {x: -15, y: 0});
     galaxy(stars, n/2, {x: 15, y: 0});
@@ -225,7 +230,7 @@ function simulate(n) {
             step(stars, dt / 1000);
             regions.push(findRegion(stars));
             regions.splice(0, regions.length - 50);
-            draw(stars, average(regions));
+            draw(stars, average(regions), background);
             //const s = 10;
             //draw(stars, {x: -s, y: -s, w: s*2, h: s*2});
             drawEnergy(stars);
@@ -239,7 +244,9 @@ function simulate(n) {
 }
 
 function load() {
-    simulate(400);
+    const img = new Image();
+    img.onload = function() { simulate(400, img); };
+    img.src = "dark-space-1.jpeg";
 }
 
 document.addEventListener("DOMContentLoaded", load);
