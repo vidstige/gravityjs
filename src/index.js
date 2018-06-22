@@ -111,6 +111,7 @@ function drawEnergy(stars) {
 
     const canvas = document.getElementById('overlay');
     const ctx = canvas.getContext("2d");
+    ctx.strokeStyle="#999";
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
     ctx.beginPath();
     ctx.moveTo(0, 40);
